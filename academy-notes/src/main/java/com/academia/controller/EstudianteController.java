@@ -1,37 +1,92 @@
 package com.academia.controller;
 
 import com.academia.dto.EstudianteDTO;
+import com.academia.dto.ResponseDTO;
 import com.academia.model.Estudiante;
-import lombok.RequiredArgsConstructor;
+import com.academia.service.IEstudianteService;
+import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/estudiantes")
-@RequiredArgsConstructor
 public class EstudianteController {
+
+    @Autowired
+    private IEstudianteService service;
+
+    @Autowired
+    @Qualifier("estudianteMapper")
+    private ModelMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<EstudianteDTO>> readAll() throws Exception {
 
-        EstudianteDTO estudiante1 = new EstudianteDTO(1, "Erick", "Ibañez", "Velasco", "12345678", 20);
-        EstudianteDTO estudiante2 = new EstudianteDTO(2, "Miriam", "Lopez", "Surco", "123456", 15);
-        EstudianteDTO estudiante3 = new EstudianteDTO(3, "Michelle", "Ibañez", "Lopez", "12344", 10);
-
-        List<EstudianteDTO> lista = new ArrayList<>();
-
-        lista.add(estudiante1);
-        lista.add(estudiante2);
-        lista.add(estudiante3);
+        List<EstudianteDTO> lista = service.readAll().stream().map(this::convertToDto).collect(Collectors.toList());
 
         return new ResponseEntity<>(lista, HttpStatus.OK);
 
+    }
+
+    @PostMapping
+    public ResponseEntity<EstudianteDTO> create(@Valid @RequestBody EstudianteDTO estudiante) throws Exception {
+
+        Estudiante obj = service.save(this.convertToEntity(estudiante));
+
+        return new ResponseEntity<>(this.convertToDto(obj), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EstudianteDTO> update(@Valid @PathVariable("id") Integer id,  @RequestBody EstudianteDTO estudianteDTO) throws Exception {
+
+        estudianteDTO.setIdEstudiante(id);
+        Estudiante obj = service.update(this.convertToEntity(estudianteDTO), id);
+        return new ResponseEntity<>(this.convertToDto(obj), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseDTO<EstudianteDTO>> readByIdResponse(@PathVariable("id") Integer id) throws Exception {
+        Estudiante estudiante = service.readById(id);
+        EstudianteDTO estudianteDTO = this.convertToDto(estudiante);
+
+        ResponseDTO<EstudianteDTO> response = new ResponseDTO<>();
+        response.setData(List.of(estudianteDTO));
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage("OK");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") Integer id) throws Exception{
+        service.delete(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Metodo que convierte un Product a CategoriaDto
+     *
+     * @param estudiante
+     * @return
+     */
+    private EstudianteDTO convertToDto(Estudiante estudiante){
+        return mapper.map(estudiante, EstudianteDTO.class);
+    }
+
+    /**
+     * Metodo que convierte de un objeto ProductDTO a Product
+     * @param productDTO
+     * @return
+     */
+    private Estudiante convertToEntity(EstudianteDTO estudianteDTO){
+        return mapper.map(estudianteDTO, Estudiante.class);
     }
 
 }

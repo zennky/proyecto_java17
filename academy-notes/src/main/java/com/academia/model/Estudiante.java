@@ -18,7 +18,7 @@ public class Estudiante {
     private Integer idEstudiante;
 
     @Column(nullable = false, length = 25, name = "nombre")
-    private String nombre;
+    private String nombres;
 
     @Column(nullable = false, length = 30, name = "apellido1")
     private String apellido1;
