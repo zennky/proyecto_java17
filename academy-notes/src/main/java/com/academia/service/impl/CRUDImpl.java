@@ -41,5 +41,6 @@ public abstract class CRUDImpl<T, ID> implements ICRUD<T, ID> {
     @Override
     public void delete(ID id) throws Exception {
         getRepo().findById(id).orElseThrow(() -> new ModelNotFoundException("ID no encontrado: " + id));
+        getRepo().deleteById(id);
     }
 }

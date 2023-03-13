@@ -1,12 +1,10 @@
 package com.academia.dto;
 
-import com.academia.model.DetalleMatricula;
-import com.academia.model.Estudiante;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -15,6 +13,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MatriculaDTO {
 
     private Integer idMatricula;
@@ -23,12 +22,13 @@ public class MatriculaDTO {
     private LocalDateTime fechaMatricula;
 
     @NotNull
-    private Estudiante estudiante;
+    private EstudianteDTO estudiante;
 
     @NotNull
     private Boolean estado;
 
     @NotNull
-    private List<DetalleMatricula> detalleMatriculas;
+    @JsonManagedReference
+    private List<DetalleMatriculaDTO> detalles;
 
 }

@@ -1,8 +1,11 @@
 package com.academia.controller;
 
-import com.academia.dto.EstudianteDTO;
+import com.academia.dto.CursoDTO;
+import com.academia.dto.CursoDTO;
 import com.academia.dto.ResponseDTO;
+import com.academia.model.Curso;
 import com.academia.model.Estudiante;
+import com.academia.service.ICursoService;
 import com.academia.service.IEstudianteService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -16,22 +19,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/estudiantes")
-public class EstudianteController {
+@RequestMapping("/curso")
+public class CursoController {
 
     @Autowired
-    private IEstudianteService service;
+    private ICursoService service;
 
     @Autowired
-    @Qualifier("estudianteMapper")
+    @Qualifier("cursoMapper")
     private ModelMapper mapper;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<EstudianteDTO>> readAll() throws Exception {
+    public ResponseEntity<ResponseDTO<CursoDTO>> readAll() throws Exception {
 
-        List<EstudianteDTO> lista = service.readAll().stream().map(this::convertToDto).collect(Collectors.toList());
+        List<CursoDTO> lista = service.readAll().stream().map(this::convertToDto).collect(Collectors.toList());
 
-        ResponseDTO<EstudianteDTO> response = new ResponseDTO<>();
+        ResponseDTO<CursoDTO> response = new ResponseDTO<>();
         response.setData(lista);
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("OK");
@@ -41,11 +44,11 @@ public class EstudianteController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDTO<EstudianteDTO>> create(@Valid @RequestBody EstudianteDTO estudiante) throws Exception {
+    public ResponseEntity<ResponseDTO<CursoDTO>> create(@Valid @RequestBody CursoDTO curso) throws Exception {
 
-        Estudiante obj = service.save(this.convertToEntity(estudiante));
+        Curso obj = service.save(this.convertToEntity(curso));
 
-        ResponseDTO<EstudianteDTO> response = new ResponseDTO<>();
+        ResponseDTO<CursoDTO> response = new ResponseDTO<>();
         response.setData(List.of(this.convertToDto(obj)));
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("OK");
@@ -54,12 +57,12 @@ public class EstudianteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseDTO<EstudianteDTO>> update(@Valid @PathVariable("id") Integer id,  @RequestBody EstudianteDTO estudianteDTO) throws Exception {
+    public ResponseEntity<ResponseDTO<CursoDTO>> update(@Valid @PathVariable("id") Integer id,  @RequestBody CursoDTO cursoDTO) throws Exception {
 
-        estudianteDTO.setIdEstudiante(id);
-        Estudiante obj = service.update(this.convertToEntity(estudianteDTO), id);
+        cursoDTO.setIdCurso(id);
+        Curso obj = service.update(this.convertToEntity(cursoDTO), id);
 
-        ResponseDTO<EstudianteDTO> response = new ResponseDTO<>();
+        ResponseDTO<CursoDTO> response = new ResponseDTO<>();
         response.setData(List.of(this.convertToDto(obj)));
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("OK");
@@ -68,12 +71,12 @@ public class EstudianteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseDTO<EstudianteDTO>> readByIdResponse(@PathVariable("id") Integer id) throws Exception {
-        Estudiante estudiante = service.readById(id);
-        EstudianteDTO estudianteDTO = this.convertToDto(estudiante);
+    public ResponseEntity<ResponseDTO<CursoDTO>> readByIdResponse(@PathVariable("id") Integer id) throws Exception {
+        Curso curso = service.readById(id);
+        CursoDTO cursoDTO = this.convertToDto(curso);
 
-        ResponseDTO<EstudianteDTO> response = new ResponseDTO<>();
-        response.setData(List.of(estudianteDTO));
+        ResponseDTO<CursoDTO> response = new ResponseDTO<>();
+        response.setData(List.of(cursoDTO));
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("OK");
 
@@ -84,7 +87,7 @@ public class EstudianteController {
 
         service.delete(id);
 
-        ResponseDTO<EstudianteDTO> response = new ResponseDTO<>();
+        ResponseDTO<CursoDTO> response = new ResponseDTO<>();
         //response.setData(List.of(this.convertToDto(obj)));
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("OK");
@@ -93,22 +96,22 @@ public class EstudianteController {
     }
 
     /**
-     * Metodo que convierte un Product a CategoriaDto
+     * Metodo que convierte un Curso a CursoDto
      *
-     * @param estudiante
+     * @param curso
      * @return
      */
-    private EstudianteDTO convertToDto(Estudiante estudiante){
-        return mapper.map(estudiante, EstudianteDTO.class);
+    private CursoDTO convertToDto(Curso curso){
+        return mapper.map(curso, CursoDTO.class);
     }
 
     /**
-     * Metodo que convierte de un objeto ProductDTO a Product
-     * @param productDTO
+     * Metodo que convierte de un objeto CursoDTO a Curso
+     * @param cursoDTO
      * @return
      */
-    private Estudiante convertToEntity(EstudianteDTO estudianteDTO){
-        return mapper.map(estudianteDTO, Estudiante.class);
+    private Curso convertToEntity(CursoDTO cursoDTO){
+        return mapper.map(cursoDTO, Curso.class);
     }
 
 }
